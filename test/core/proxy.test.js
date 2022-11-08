@@ -118,7 +118,7 @@ describe('Proxy tests', () => {
     try {
       const resp = await customCtx.request('http://portquiz.net:666/');
       assert.strictEqual(resp.statusCode, 200);
-      assert.strictEqual(resp.httpVersionMajor, 2);
+      assert.strictEqual(resp.httpVersionMajor, 1);
     } finally {
       await customCtx.reset();
     }
