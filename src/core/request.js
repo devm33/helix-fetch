@@ -209,7 +209,6 @@ const getProtocolAndSocketFromFactory = async (socketFactory, url, requestOption
     // Make sure to pass ALPNProtocols to the secure handshake
     // otherwise it will fallback to HTTP/1.1
     const secOpts = { ...options, ALPNProtocols: alpns };
-    secOpts.socket = socket;
     const secureSocket = await connectTLS(url, secOpts);
     const protocol = secureSocket.alpnProtocol || ALPN_HTTP1_1;
     return { protocol, socket: secureSocket };
