@@ -1,3 +1,45 @@
+# [3.3.0](https://github.com/adobe/fetch/compare/v3.2.1...v3.3.0) (2022-10-25)
+
+
+### Features
+
+* don't use ALPN when enforcing HTTP/1.X ([#316](https://github.com/adobe/fetch/issues/316)) ([e2fcc05](https://github.com/adobe/fetch/commit/e2fcc05f9aa5fa8d703d1a10ae7f7d19621ee894))
+
+## [3.2.1](https://github.com/adobe/fetch/compare/v3.2.0...v3.2.1) (2022-10-14)
+
+
+### Bug Fixes
+
+* regression regarding Headers.plain(); introduced Headers.raw() ([#312](https://github.com/adobe/fetch/issues/312)) ([2a05a77](https://github.com/adobe/fetch/commit/2a05a774e37cdf1d126e4c4a3a2bf856aa1b39b9))
+
+# [3.2.0](https://github.com/adobe/fetch/compare/v3.1.4...v3.2.0) (2022-10-13)
+
+
+### Features
+
+* support raw Set-Cookie headers ([#310](https://github.com/adobe/fetch/issues/310)) ([d5c80aa](https://github.com/adobe/fetch/commit/d5c80aa1fcadb033dcc46aa14c8df5380ba063a6)), closes [#309](https://github.com/adobe/fetch/issues/309)
+
+## [3.1.4](https://github.com/adobe/fetch/compare/v3.1.3...v3.1.4) (2022-09-20)
+
+
+### Bug Fixes
+
+* user-agent ([4e3bacf](https://github.com/adobe/fetch/commit/4e3bacf579ad34ff538cb9a08b17d5773a5ff543))
+
+## [3.1.3](https://github.com/adobe/fetch/compare/v3.1.2...v3.1.3) (2022-09-20)
+
+
+### Bug Fixes
+
+* force release (rename adobe/helix-fetch to adobe/fetch) ([dbfc05f](https://github.com/adobe/fetch/commit/dbfc05f5506005c880b8864ba01a9c738324a9f5))
+
+## [3.1.2](https://github.com/adobe/helix-fetch/compare/v3.1.1...v3.1.2) (2022-08-07)
+
+
+### Bug Fixes
+
+* **deps:** update dependency lru-cache to v7.13.2 ([#298](https://github.com/adobe/helix-fetch/issues/298)) ([47e0290](https://github.com/adobe/helix-fetch/commit/47e0290bc883fa72cf1891b29b7f58d7faad68f1))
+
 ## [3.1.1](https://github.com/adobe/helix-fetch/compare/v3.1.0...v3.1.1) (2022-06-29)
 
 

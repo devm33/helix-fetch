@@ -16,7 +16,7 @@ const http = require('http');
 const https = require('https');
 const { Readable } = require('stream');
 
-const debug = require('debug')('helix-fetch:h1');
+const debug = require('debug')('adobe/fetch:h1');
 
 const { RequestAbortedError } = require('./errors');
 const { decodeStream } = require('../common/utils');
@@ -105,6 +105,7 @@ const h1Request = async (ctx, url, options) => {
   if (socket) {
     // we've got a socket from initial protocol negotiation via ALPN
     delete opts.socket;
+    /* istanbul ignore next */
     if (!socket.assigned) {
       socket.assigned = true;
       // reuse socket for actual request

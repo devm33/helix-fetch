@@ -74,16 +74,30 @@ class Headers {
     };
 
     if (init instanceof Headers) {
-      init.forEach((value, name) => {
-        this.append(name, value);
+      init[INTERNALS].map.forEach((value, name) => {
+        this[INTERNALS].map.set(name, Array.isArray(value) ? [...value] : value);
       });
     } else if (Array.isArray(init)) {
       init.forEach(([name, value]) => {
-        this.append(name, value);
+        if (Array.isArray(value)) {
+          // special case for Set-Cookie header which can have an array of values
+          value.forEach((val) => {
+            this.append(name, val);
+          });
+        } else {
+          this.append(name, value);
+        }
       });
     } else /* istanbul ignore else  */ if (isPlainObject(init)) {
       for (const [name, value] of Object.entries(init)) {
-        this.append(name, value);
+        if (Array.isArray(value)) {
+          // special case for Set-Cookie header which can have an array of values
+          value.forEach((val) => {
+            this.append(name, val);
+          });
+        } else {
+          this.set(name, value);
+        }
       }
     }
   }
@@ -98,14 +112,26 @@ class Headers {
 
   get(name) {
     const val = this[INTERNALS].map.get(normalizeName(name));
-    return val === undefined ? null : val;
+    if (val === undefined) {
+      return null;
+    } else if (Array.isArray(val)) {
+      return val.join(', ');
+    } else {
+      return val;
+    }
   }
 
   append(name, value) {
     const nm = normalizeName(name);
     const val = normalizeValue(value, name);
     const oldVal = this[INTERNALS].map.get(nm);
-    this[INTERNALS].map.set(nm, oldVal ? `${oldVal}, ${val}` : val);
+    if (Array.isArray(oldVal)) {
+      oldVal.push(val);
+    } else if (oldVal === undefined) {
+      this[INTERNALS].map.set(nm, val);
+    } else {
+      this[INTERNALS].map.set(nm, [oldVal, val]);
+    }
   }
 
   delete(name) {
@@ -151,11 +177,27 @@ class Headers {
 
   /**
    * Returns the headers as a plain object.
-   * (extension)
+   * (non-spec extension)
    *
-   * @return {object}
+   * @returns {Record<string, string>}
    */
   plain() {
+    return [...this.keys()].reduce((result, key) => {
+      // eslint-disable-next-line no-param-reassign
+      result[key] = this.get(key);
+      return result;
+    }, {});
+  }
+
+  /**
+   * Returns the internal/raw representation of the
+   * headers, i.e. the value of an multi-valued header
+   * (added with <code>append()</code>) is an array of strings.
+   * (non-spec extension)
+   *
+   * @returns {Record<string, string|string[]>}
+   */
+  raw() {
     return Object.fromEntries(this[INTERNALS].map);
   }
 }

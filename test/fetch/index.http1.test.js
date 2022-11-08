@@ -166,9 +166,18 @@ testParams.forEach((params) => {
       }
     });
 
-    it(`concurrent HTTP/1.1 requests to same origin (${name})`, async function test() {
-      this.timeout(5000);
+    it(`negotiates protocol (${name})`, async () => {
+      const { fetch, reset } = context({ alpnProtocols: [ALPN_HTTP1_0, ALPN_HTTP1_1] });
+      try {
+        const resp = await fetch(`${protocol}://httpbin.org/status/200`);
+        assert.strictEqual(resp.status, 200);
+        assert(['1.0', '1.1'].includes(resp.httpVersion));
+      } finally {
+        await reset();
+      }
+    });
 
+    it(`concurrent HTTP/1.1 requests to same origin (${name})`, async () => {
       const { fetch, reset } = context({ alpnProtocols: [ALPN_HTTP1_1] });
       const N = 200; // # of parallel requests
       // httpbingo.org seems to be more stable than httpbin.org
@@ -217,9 +226,7 @@ testParams.forEach((params) => {
     });
   });
 
-  it(`concurrent HTTP/1.1 requests to same origin using different contexts (${name})`, async function test() {
-    this.timeout(5000);
-
+  it(`concurrent HTTP/1.1 requests to same origin using different contexts (${name})`, async () => {
     const doFetch = async (ctx, url) => ctx.fetch(url);
 
     const N = 50; // # of parallel requests

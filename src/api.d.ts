@@ -144,7 +144,7 @@ export class Response extends Body {
   readonly decoded: boolean;
   headers: Headers;
 
-  // extensions
+  // non-spec extensions
   /**
    * A boolean specifying whether the response was retrieved from the cache.
    */
@@ -178,7 +178,7 @@ export interface Http2Options {
 export interface ContextOptions {
   /**
    * Value of `user-agent` request header
-   * @default 'helix-fetch/<version>'
+   * @default 'adobe-fetch/<version>'
    */
   userAgent?: string;
   /**
@@ -264,7 +264,7 @@ export interface RequestOptions {
 	 */
   signal?: AbortSignal;
 
-  // extensions
+  // non-spec extensions
   /**
    * A boolean specifying support of gzip/deflate/brotli content encoding.
    * @default true

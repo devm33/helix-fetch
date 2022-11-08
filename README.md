@@ -1,16 +1,16 @@
 <div align="center">
-  <img src="banner.jpeg" alt="Helix Fetch"/>
+  <img src="banner.jpeg" alt="Adobe Fetch"/>
   <br>
   <p>Light-weight <a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API">Fetch API</a> implementation transparently supporting both <b>HTTP/1(.1)</b> and <b>HTTP/2</b></p>
-  <a href="https://codecov.io/gh/adobe/helix-fetch"><img src="https://img.shields.io/codecov/c/github/adobe/helix-fetch.svg" alt="codecov"></a>
-  <a href="https://circleci.com/gh/adobe/helix-fetch"><img src="https://img.shields.io/circleci/project/github/adobe/helix-fetch.svg" alt="CircleCI"></a>
-  <a href="https://github.com/adobe/helix-fetch/blob/main/LICENSE.txt"><img src="https://img.shields.io/github/license/adobe/helix-fetch.svg" alt="GitHub license"></a>
-  <a href="https://github.com/adobe/helix-fetch/issues"><img src="https://img.shields.io/github/issues/adobe/helix-fetch.svg" alt="GitHub issues"></a>
-  <a href="https://lgtm.com/projects/g/adobe/helix-fetch"><img src="https://img.shields.io/lgtm/grade/javascript/g/adobe/helix-fetch.svg?logo=lgtm&logoWidth=18" alt="LGTM Code Quality Grade: JavaScript"></a>
+  <a href="https://codecov.io/gh/adobe/fetch"><img src="https://img.shields.io/codecov/c/github/adobe/fetch.svg" alt="codecov"></a>
+  <a href="https://circleci.com/gh/adobe/fetch"><img src="https://img.shields.io/circleci/project/github/adobe/fetch.svg" alt="CircleCI"></a>
+  <a href="https://github.com/adobe/fetch/blob/main/LICENSE.txt"><img src="https://img.shields.io/github/license/adobe/fetch.svg" alt="GitHub license"></a>
+  <a href="https://github.com/adobe/fetch/issues"><img src="https://img.shields.io/github/issues/adobe/fetch.svg" alt="GitHub issues"></a>
+  <a href="https://lgtm.com/projects/g/adobe/fetch"><img src="https://img.shields.io/lgtm/grade/javascript/g/adobe/fetch.svg?logo=lgtm&logoWidth=18" alt="LGTM Code Quality Grade: JavaScript"></a>
   <a href="https://renovatebot.com/"><img src="https://img.shields.io/badge/renovate-enabled-brightgreen.svg" alt="Renovate enabled"></a>
   <a href="https://github.com/semantic-release/semantic-release"><img src="https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg" alt="semantic-release"></a>
-	<a href="https://packagephobia.now.sh/result?p=@adobe/helix-fetch"><img src="https://badgen.net/packagephobia/install/@adobe/helix-fetch" alt="Install size"></a>
-  <a href="https://www.npmjs.com/package/@adobe/helix-fetch"><img src="https://img.shields.io/npm/v/@adobe/helix-fetch" alt="Current version"></a>
+	<a href="https://packagephobia.now.sh/result?p=@adobe/fetch"><img src="https://badgen.net/packagephobia/install/@adobe/fetch" alt="Install size"></a>
+  <a href="https://www.npmjs.com/package/@adobe/fetch"><img src="https://img.shields.io/npm/v/@adobe/fetch" alt="Current version"></a>
 </div>
 
 ---
@@ -19,7 +19,6 @@
 - [About](#about)
 - [Features](#features)
 - [Installation](#installation)
-- [Upgrading](#upgrading)
 - [API](#api)
   - [Context](#context)
 - [Common Usage Examples](#common-usage-examples)
@@ -38,6 +37,7 @@
   - [HTTP/2 Server Push](#http2-server-push)
   - [Force HTTP/1(.1) protocol](#force-http11-protocol)
   - [HTTP/1.1 Keep-Alive](#http11-keep-alive)
+  - [Extract Set-Cookie Header](#extract-set-cookie-header)
   - [Self-signed Certificates](#self-signed-certificates)
   - [Set cache size limit](#set-cache-size-limit)
   - [Disable caching](#disable-caching)
@@ -56,17 +56,17 @@
 
 ## About
 
-`helix-fetch` in general adheres to the [Fetch API Specification](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API), implementing a subset of the API. However, there are some notable deviations:
+`@adobe/fetch` in general adheres to the [Fetch API Specification](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API), implementing a subset of the API. However, there are some notable deviations:
 
 * `Response.body` returns a Node.js [Readable stream](https://nodejs.org/api/stream.html#stream_readable_streams).
 * `Response.blob()` is not implemented. Use `Response.buffer()` instead.
 * `Response.formData()` is not implemented.
 * Cookies are not stored by default. However, cookies can be extracted and passed by manipulating request and response headers.
 * The following values of the `fetch()` option `cache` are supported: `'default'` (the implicit default) and `'no-store'`. All other values are currently ignored.  
-* The following `fetch()` options are ignored due to the nature of Node.js and since `helix-fetch` doesn't have the concept of web pages: `mode`, `referrer`, `referrerPolicy`, `integrity` and `credentials`.
+* The following `fetch()` options are ignored due to the nature of Node.js and since `@adobe/fetch` doesn't have the concept of web pages: `mode`, `referrer`, `referrerPolicy`, `integrity` and `credentials`.
 * The `fetch()` option `keepalive` is not supported. But you can use the `h1.keepAlive` context option, as demonstrated [here](#http11-keep-alive).
 
-`helix-fetch` also supports the following extensions:
+`@adobe/fetch` also supports the following non-spec extensions:
 
 * `Response.buffer()` returns a Node.js `Buffer`.
 * `Response.url` contains the final url when following redirects.
@@ -76,6 +76,7 @@
 * The `Response` object has an extra property `fromCache` which determines whether the response was retrieved from cache.
 * The `Response` object has an extra property `decoded` which determines whether the response body was automatically decoded (see Fetch option `decode` below).
 * `Response.headers.plain()` returns the headers as a plain object.
+* `Response.headers.raw()` returns the internal/raw representation of the headers where e.g. the `Set-Cokkie` header is represented with an array of strings value.
 * The Fetch option `follow` allows to limit the number of redirects to follow (default: `20`).
 * The Fetch option `compress` enables transparent gzip/deflate/br content encoding (default: `true`).
 * The Fetch option `decode` enables transparent gzip/deflate/br content decoding (default: `true`).
@@ -100,15 +101,8 @@ Note that non-standard Fetch options have been aligned with [node-fetch](https:/
 > As of v2 Node version >= 12 is required.
 
 ```bash
-$ npm install @adobe/helix-fetch
+$ npm install @adobe/fetch
 ```
-
-## Upgrading
-
-Upgrading from an old version of `helix-fetch`? Check out the following files:
-
-- [1.x to 2.x Upgrade Guide](v2-UPGRADE-GUIDE.md)
-- [Changelog](CHANGELOG.md)
 
 ## API
 
@@ -120,7 +114,7 @@ Apart from the standard Fetch API
 * `Headers`
 * `Body`
 
-`helix-fetch` exposes the following extensions:
+`@adobe/fetch` exposes the following non-spec extensions:
 
 * `context()` - creates a new customized API context
 * `reset()` - resets the current API context, i.e. closes pending sessions/sockets, clears internal caches, etc ...
@@ -146,7 +140,7 @@ The following options are supported:
 interface ContextOptions {
   /**
    * Value of `user-agent` request header
-   * @default 'helix-fetch/<version>'
+   * @default 'adobe-fetch/<version>'
    */
   userAgent?: string;
   /**
@@ -235,7 +229,7 @@ interface Http2Options {
 ### Access Response Headers and other Meta data
 
 ```javascript
-  const { fetch } = require('@adobe/helix-fetch');
+  const { fetch } = require('@adobe/fetch');
 
   const resp = await fetch('https://httpbin.org/get');
   console.log(resp.ok);
@@ -249,7 +243,7 @@ interface Http2Options {
 ### Fetch JSON
 
 ```javascript
-  const { fetch } = require('@adobe/helix-fetch');
+  const { fetch } = require('@adobe/fetch');
 
   const resp = await fetch('https://httpbin.org/json');
   const jsonData = await resp.json();
@@ -258,7 +252,7 @@ interface Http2Options {
 ### Fetch text data
 
 ```javascript
-  const { fetch } = require('@adobe/helix-fetch');
+  const { fetch } = require('@adobe/fetch');
 
   const resp = await fetch('https://httpbin.org/');
   const textData = await resp.text();
@@ -267,7 +261,7 @@ interface Http2Options {
 ### Fetch binary data
 
 ```javascript
-  const { fetch } = require('@adobe/helix-fetch');
+  const { fetch } = require('@adobe/fetch');
 
   const resp = await fetch('https://httpbin.org//stream-bytes/65535');
   const imageData = await resp.buffer();
@@ -275,10 +269,10 @@ interface Http2Options {
 
 ### Specify a timeout for a `fetch` operation
 
-Using `timeoutSignal(ms)` extension:
+Using `timeoutSignal(ms)` non-spec extension:
 
 ```javascript
-  const { fetch, timeoutSignal, AbortError } = require('@adobe/helix-fetch');
+  const { fetch, timeoutSignal, AbortError } = require('@adobe/fetch');
 
   const signal = timeoutSignal(1000);
   try {
@@ -297,7 +291,7 @@ Using `timeoutSignal(ms)` extension:
 Using `AbortController`:
 
 ```javascript
-  const { fetch, AbortController, AbortError } = require('@adobe/helix-fetch');
+  const { fetch, AbortController, AbortError } = require('@adobe/fetch');
 
   const controller = new AbortController();
   const timerId = setTimeout(() => controller.abort(), 1000);
@@ -320,7 +314,7 @@ Using `AbortController`:
 
 ```javascript
   const fs = require('fs');
-  const { fetch } = require('@adobe/helix-fetch');
+  const { fetch } = require('@adobe/fetch');
 
   const resp = await fetch('https://httpbin.org/image/jpeg');
   resp.body.pipe(fs.createWriteStream('saved-image.jpg'));
@@ -329,7 +323,7 @@ Using `AbortController`:
 ### Post JSON
 
 ```javascript
-  const { fetch } = require('@adobe/helix-fetch');
+  const { fetch } = require('@adobe/fetch');
 
   const method = 'POST';
   const body = { foo: 'bar' };
@@ -340,7 +334,7 @@ Using `AbortController`:
 
 ```javascript
   const fs = require('fs');
-  const { fetch } = require('@adobe/helix-fetch');
+  const { fetch } = require('@adobe/fetch');
 
   const method = 'POST';
   const body = fs.createReadStream('some-image.jpg');
@@ -354,7 +348,7 @@ Using `AbortController`:
   const { FormData, Blob, File } = require('formdata-node'); // spec-compliant implementations
   const { fileFromPath } = require('formdata-node/file-from-path'); // helper for creating File instance from disk file
 
-  const { fetch } = require('@adobe/helix-fetch');
+  const { fetch } = require('@adobe/fetch');
 
   const method = 'POST';
   const fd = new FormData();
@@ -369,10 +363,10 @@ Using `AbortController`:
 ### GET with query parameters object
 
 ```javascript
-const { createUrl, fetch } = require('@adobe/helix-fetch');
+const { createUrl, fetch } = require('@adobe/fetch');
 
 const qs = {
-  helix: 'dummy',
+  fake: 'dummy',
   foo: 'bar',
   rumple: "stiltskin",
 };
@@ -383,10 +377,10 @@ const resp = await fetch(createUrl('https://httpbin.org/json', qs));
 or using `URLSearchParams`:
 
 ```javascript
-const { fetch } = require('@adobe/helix-fetch');
+const { fetch } = require('@adobe/fetch');
 
 const body = new URLSearchParams({
-  helix: 'dummy',
+  fake: 'dummy',
   foo: 'bar',
   rumple: "stiltskin",
 });
@@ -399,7 +393,7 @@ const resp = await fetch('https://httpbin.org/json', { body });
 Responses of `GET` and `HEAD` requests are by default cached, according to the rules of [RFC 7234](https://httpwg.org/specs/rfc7234.html):
 
 ```javascript
-const { fetch } = require('@adobe/helix-fetch');
+const { fetch } = require('@adobe/fetch');
 
 const url = 'https://httpbin.org/cache/60'; // -> max-age=60 (seconds)
 // send initial request, priming cache
@@ -416,7 +410,7 @@ assert(resp.fromCache);
 You can disable caching per request with the `cache: 'no-store'` option:
 
 ```javascript
-const { fetch } = require('@adobe/helix-fetch');
+const { fetch } = require('@adobe/fetch');
 
 const resp = await fetch('https://httbin.org/', { cache: 'no-store' });
 assert(resp.ok);
@@ -426,7 +420,7 @@ assert(!resp.fromCache);
 You can disable caching entirely:
 
 ```javascript
-const { fetch } = require('@adobe/helix-fetch').noCache();
+const { fetch } = require('@adobe/fetch').noCache();
 ```
 
 ## Advanced Usage Examples
@@ -437,7 +431,7 @@ Note that pushed resources will be automatically and transparently added to the 
 You can however add a listener which will be notified on every pushed (and cached) resource.
 
 ```javascript
-  const { fetch, onPush } = require('@adobe/helix-fetch');
+  const { fetch, onPush } = require('@adobe/fetch');
 
   onPush((url, response) => console.log(`received server push: ${url} status ${response.status}`));
 
@@ -448,7 +442,7 @@ You can however add a listener which will be notified on every pushed (and cache
 ### Force HTTP/1(.1) protocol
 
 ```javascript
-  const { fetch } = require('@adobe/helix-fetch').h1();
+  const { fetch } = require('@adobe/fetch').h1();
 
   const resp = await fetch('https://nghttp2.org');
   console.log(`Http version: ${resp.httpVersion}`);
@@ -457,16 +451,28 @@ You can however add a listener which will be notified on every pushed (and cache
 ### HTTP/1.1 Keep-Alive
 
 ```javascript
-const { fetch } = require('@adobe/helix-fetch').keepAlive();
+const { fetch } = require('@adobe/fetch').keepAlive();
 
 const resp = await fetch('https://httpbin.org/status/200');
 console.log(`Connection: ${resp.headers.get('connection')}`); // -> keep-alive
 ```
 
+### Extract Set-Cookie Header
+
+Unlike browsers, you can access raw `Set-Cookie` headers manually using `Headers.raw()`. This is an `@adobe/fetch` only API.
+
+```javascript
+const { fetch } = require('@adobe/fetch');
+
+const resp = await fetch('https://httpbin.org/cookies/set?a=1&b=2');
+// returns an array of values, instead of a string of comma-separated values
+console.log(resp.headers.raw()['set-cookie']);
+```
+
 ### Self-signed Certificates
 
 ```javascript
-const { fetch } = require('@adobe/helix-fetch').context({ rejectUnauthorized: false });
+const { fetch } = require('@adobe/fetch').context({ rejectUnauthorized: false });
 
 const resp = await fetch('https://localhost:8443/');  // a server using a self-signed certificate
 ```
@@ -474,7 +480,7 @@ const resp = await fetch('https://localhost:8443/');  // a server using a self-s
 ### Set cache size limit
 
 ```javascript
-  const { fetch, cacheStats } = require('@adobe/helix-fetch').context({
+  const { fetch, cacheStats } = require('@adobe/fetch').context({
     maxCacheSize: 100 * 1024, // 100kb (Default: 100mb)
   });
 
@@ -486,7 +492,7 @@ const resp = await fetch('https://localhost:8443/');  // a server using a self-s
 ### Disable caching
 
 ```javascript
-  const { fetch } = require('@adobe/helix-fetch').noCache();
+  const { fetch } = require('@adobe/fetch').noCache();
 
   let resp = await fetch('https://httpbin.org/cache/60'); // -> max-age=60 (seconds)
   // re-fetch
@@ -497,7 +503,7 @@ const resp = await fetch('https://localhost:8443/');  // a server using a self-s
 ### Set a custom user agent
 
 ```javascript
-  const { fetch } = require('@adobe/helix-fetch').context({
+  const { fetch } = require('@adobe/fetch').context({
     userAgent: 'custom-fetch'
   });
 
@@ -532,26 +538,26 @@ $ npm run lint
 
 ### Troubleshooting
 
-You can enable `helix-fetch` low-level debug console output by setting the `DEBUG` environment variable to `helix-fetch*`, e.g.:
+You can enable `@adobe/fetch` low-level debug console output by setting the `DEBUG` environment variable to `adobe/fetch*`, e.g.:
 
 ```bash
-$ DEBUG=helix-fetch* node test.js
+$ DEBUG=adobe/fetch* node test.js
 ```
 
 This will produce console outout similar to:
 
 ```bash
   ...
-  helix-fetch:core established TLS connection: #48 (www.nghttp2.org) +2s
-  helix-fetch:core www.nghttp2.org -> h2 +0ms
-  helix-fetch:h2 reusing socket #48 (www.nghttp2.org) +2s
-  helix-fetch:h2 GET www.nghttp2.org/httpbin/user-agent +0ms
-  helix-fetch:h2 session https://www.nghttp2.org established +1ms
-  helix-fetch:h2 caching session https://www.nghttp2.org +0ms
-  helix-fetch:h2 session https://www.nghttp2.org remoteSettings: {"headerTableSize":8192,"enablePush":true,"initialWindowSize":1048576,"maxFrameSize":16384,"maxConcurrentStreams":100,"maxHeaderListSize":4294967295,"maxHeaderSize":4294967295,"enableConnectProtocol":true} +263ms
-  helix-fetch:h2 session https://www.nghttp2.org localSettings: {"headerTableSize":4096,"enablePush":true,"initialWindowSize":65535,"maxFrameSize":16384,"maxConcurrentStreams":4294967295,"maxHeaderListSize":4294967295,"maxHeaderSize":4294967295,"enableConnectProtocol":false} +0ms
-  helix-fetch:h2 session https://www.nghttp2.org closed +6ms
-  helix-fetch:h2 discarding cached session https://www.nghttp2.org +0ms
+  adobe/fetch:core established TLS connection: #48 (www.nghttp2.org) +2s
+  adobe/fetch:core www.nghttp2.org -> h2 +0ms
+  adobe/fetch:h2 reusing socket #48 (www.nghttp2.org) +2s
+  adobe/fetch:h2 GET www.nghttp2.org/httpbin/user-agent +0ms
+  adobe/fetch:h2 session https://www.nghttp2.org established +1ms
+  adobe/fetch:h2 caching session https://www.nghttp2.org +0ms
+  adobe/fetch:h2 session https://www.nghttp2.org remoteSettings: {"headerTableSize":8192,"enablePush":true,"initialWindowSize":1048576,"maxFrameSize":16384,"maxConcurrentStreams":100,"maxHeaderListSize":4294967295,"maxHeaderSize":4294967295,"enableConnectProtocol":true} +263ms
+  adobe/fetch:h2 session https://www.nghttp2.org localSettings: {"headerTableSize":4096,"enablePush":true,"initialWindowSize":65535,"maxFrameSize":16384,"maxConcurrentStreams":4294967295,"maxHeaderListSize":4294967295,"maxHeaderSize":4294967295,"enableConnectProtocol":false} +0ms
+  adobe/fetch:h2 session https://www.nghttp2.org closed +6ms
+  adobe/fetch:h2 discarding cached session https://www.nghttp2.org +0ms
   ... 
 ```
 
@@ -559,7 +565,7 @@ Additionally, you can enable Node.js low-level debug console output by setting t
 
 ```bash
 $ export NODE_DEBUG=http*,stream*
-$ export DEBUG=helix-fetch*
+$ export DEBUG=adobe/fetch*
 
 $ node test.js
 ```
