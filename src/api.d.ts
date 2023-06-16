@@ -212,6 +212,13 @@ export interface ContextOptions {
   h2?: Http2Options;
 
   socketFactory?: (requestOptions: any) => any;
+
+  /**
+   * Optionally override the trusted CA certificates. Default is to trust the
+   * well-known CAs curated by Mozilla. Mozilla's CAs are completely replaced
+   * when CAs are explicitly specified using this option.
+   */
+  ca?: string | Buffer | Array<string | Buffer> | undefined;
 }
 
 export class AbortSignal {

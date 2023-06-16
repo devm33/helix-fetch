@@ -162,6 +162,9 @@ const determineProtocol = async (ctx, url, signal) => {
     signal, // optional abort signal
     rejectUnauthorized,
   };
+  if (ctx.options.ca) {
+    connectOptions.ca = ctx.options.ca;
+  }
   const socket = await connect(url, connectOptions);
   // socket.alpnProtocol contains the negotiated protocol (e.g. 'h2', 'http1.1', 'http1.0')
   protocol = socket.alpnProtocol;
