@@ -339,6 +339,12 @@ export type PushHandler = (
 export function fetch(url: string|Request, options?: RequestOptions): Promise<Response>;
 
 /**
+ * Sets the list of trusted Certificate Authorities (CA) for the given
+ * fetch context and nested request context.
+ */
+export function setCA(ca?: string | Buffer | Array<string | Buffer>): void;
+
+/**
  * Resets the current context, i.e. disconnects all open/pending sessions, clears caches etc..
  */
 export function reset(): Promise<[void, void]>;

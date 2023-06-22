@@ -420,6 +420,12 @@ class FetchContext {
       context: (options = {}) => new FetchContext(options).api(),
 
       /**
+       * Sets the list of trusted Certificate Authorities (CA) for the given
+       * fetch context and nested request context.
+      */
+      setCA: (ca) => this.setCA(ca),
+
+      /**
        * Convenience function which creates a new context with disabled caching,
        * the equivalent of `context({ maxCacheSize: 0 })`.
        *
@@ -539,6 +545,11 @@ class FetchContext {
 
   async fetch(url, options) {
     return cachingFetch(this, url, options);
+  }
+
+  setCA(ca) {
+    this.options.ca = ca;
+    this.context.setCA(ca);
   }
 
   onPush(fn) {

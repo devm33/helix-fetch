@@ -58,6 +58,12 @@ class RequestContext {
       context: (options = {}) => new RequestContext(options).api(),
 
       /**
+       * Sets the list of trusted Certificate Authorities (CA) for the given
+       * request context.
+       */
+      setCA: (ca) => this.setCA(ca),
+
+      /**
        * Resets the current context, i.e. disconnects all open/pending sessions, clears caches etc..
        */
       reset: async () => this.reset(),
@@ -76,6 +82,10 @@ class RequestContext {
 
   async request(url, options) {
     return request(this, url, options);
+  }
+
+  setCA(ca) {
+    this.options.ca = ca;
   }
 
   async reset() {
