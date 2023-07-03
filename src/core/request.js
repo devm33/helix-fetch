@@ -205,6 +205,7 @@ const getProtocolAndSocketFromFactory = async (socketFactory, url, requestOption
     // otherwise it will fallback to HTTP/1.1
     const secOpts = { ...options, ALPNProtocols: alpns };
     secOpts.socket = socket;
+    secOpts.servername = options.host;
     const secureSocket = await connectTLS(url, secOpts);
     const protocol = secureSocket.alpnProtocol || ALPN_HTTP1_1;
     return { protocol, socket: secureSocket };
