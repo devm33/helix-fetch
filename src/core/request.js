@@ -197,7 +197,7 @@ const getProtocolAndSocketFromFactory = async (socketFactory, url, requestOption
     port = 80;
   }
   const options = {
-    ...requestOptions, host: url.host, port,
+    ...requestOptions, host: url.host, hostname: url.hostname, port,
   };
   const socket = await socketFactory(options);
   if (isSecure) {
