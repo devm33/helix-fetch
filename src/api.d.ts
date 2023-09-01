@@ -90,6 +90,8 @@ export interface ResponseInit {
   statusText?: string;
 }
 
+type FormData = Object;
+
 type BodyInit =
   | Buffer
   | URLSearchParams
