@@ -15,17 +15,18 @@
 'use strict';
 
 class FetchBaseError extends Error {
-  constructor(message, type) {
+  constructor(message, type, name) {
     super(message);
     this.type = type;
+    this._name = name;
   }
 
   get name() {
-    return this.constructor.name;
+    return this._name;
   }
 
   get [Symbol.toStringTag]() {
-    return this.constructor.name;
+    return this._name;
   }
 }
 
@@ -43,7 +44,7 @@ class FetchError extends FetchBaseError {
    * @param {SystemError} [systemError] node system error
    */
   constructor(message, type, systemError) {
-    super(message, type);
+    super(message, type, 'FetchError');
     if (systemError) {
       this.code = systemError.code;
       this.errno = systemError.errno;
@@ -54,7 +55,7 @@ class FetchError extends FetchBaseError {
 
 class AbortError extends FetchBaseError {
   constructor(message, type = 'aborted') {
-    super(message, type);
+    super(message, type, 'AbortError');
   }
 }
 
