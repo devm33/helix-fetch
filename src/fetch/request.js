@@ -90,10 +90,6 @@ class Request extends Body {
       signal = init.signal;
     }
 
-    if (signal && !(signal instanceof AbortSignal)) {
-      throw new TypeError('signal needs to be an instance of AbortSignal');
-    }
-
     const redirect = init.redirect || (req && req.redirect) || 'follow';
     if (!['follow', 'error', 'manual'].includes(redirect)) {
       throw new TypeError(`'${redirect}' is not a valid redirect option`);
